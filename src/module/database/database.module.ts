@@ -1,6 +1,9 @@
 import { Global, Module } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
 
+/**
+ * Database module
+ */
 @Global()
 @Module({
   providers: [

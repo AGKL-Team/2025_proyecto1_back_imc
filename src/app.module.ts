@@ -6,15 +6,22 @@ import { ImcModule } from './module/imc/imc.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './module/auth/auth.module';
+import { DatabaseModule } from './module/database/database.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // Configuración de TypeOrm
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
     }),
+    // Incluye módulos generales
+    DatabaseModule,
+    AuthModule,
+    // Módulos del dominio
     ImcModule,
   ],
   controllers: [AppController],

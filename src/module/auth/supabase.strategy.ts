@@ -6,7 +6,11 @@ import { SUPABASE_AUTH, UNAUTHORIZED } from 'src/module/auth/constants';
 import { SupabaseAuthStrategyOptions } from './interface/options';
 import { SupabaseAuthUser } from './user';
 
+/**
+ * This class is responsible for authenticating users with Supabase.
+ */
 export class SupabaseAuthStrategy extends Strategy {
+  /* Auth Strategy name */
   readonly name = SUPABASE_AUTH;
   private supabase: SupabaseClient;
   private extractor: JwtFromRequestFunction;
@@ -21,6 +25,7 @@ export class SupabaseAuthStrategy extends Strategy {
       );
     }
 
+    // Initialize Supabase client
     this.supabase = createClient(
       options.supabaseUrl,
       options.supabaseKey,
@@ -29,6 +34,11 @@ export class SupabaseAuthStrategy extends Strategy {
     this.extractor = options.extractor;
   }
 
+  /**
+   * Validates the JWT payload.
+   * @param payload The JWT payload.
+   * @returns The validated user or null.
+   */
   validate(payload: SupabaseAuthUser): SupabaseAuthUser | null {
     if (payload) {
       this.success(payload, {});
@@ -41,7 +51,11 @@ export class SupabaseAuthStrategy extends Strategy {
     return null;
   }
 
-  authenticate(req: Request): void {
+  /**
+   * Authenticates the user using the Supabase client.
+   * @param req The request object.
+   */
+  authenticate(req: Request) {
     const idToken: string = this.extractor(req);
 
     if (!idToken) {
