@@ -1,12 +1,22 @@
 import { Module } from '@nestjs/common';
 
+import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ImcModule } from './module/imc/imc.module';
-import { AppController } from './app.controller';
 
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [ImcModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+      autoLoadEntities: true,
+    }),
+    ImcModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
