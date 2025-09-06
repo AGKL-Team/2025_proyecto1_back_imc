@@ -1,6 +1,6 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { CalcularImcRequest } from './dto/calcular-imc-dto';
-import { ImcService } from './imc.service';
+import { ImcService } from './services/imc.service';
 
 @Controller('imc')
 export class ImcController {

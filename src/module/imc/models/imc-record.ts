@@ -11,6 +11,6 @@ export class ImcRecord {
   @Column('float')
   weight: number;
 
-  @Column('integer')
-  userId: number;
+  // @Column('integer')
+  // userId: number;
 }

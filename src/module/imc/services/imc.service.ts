@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CalcularImcRequest } from './dto/calcular-imc-dto';
-import { CalcularImcResponse } from './dto/calcular-imc-response.interface';
-import { ImcRecord } from './models/imc-record';
+import { CalcularImcRequest } from '../dto/calcular-imc-dto';
+import { CalcularImcResponse } from '../dto/calcular-imc-response.interface';
+import { ImcRecord } from '../models/imc-record';
 
 @Injectable()
 export class ImcService {
@@ -38,7 +38,6 @@ export class ImcService {
     const imcRecord = this.imcRepository.create({
       height,
       weight,
-      userId: 0,
     });
 
     return await this.imcRepository.save(imcRecord);

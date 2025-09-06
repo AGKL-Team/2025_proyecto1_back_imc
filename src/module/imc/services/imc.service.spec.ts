@@ -1,16 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CalcularImcRequest } from './dto/calcular-imc-dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CalcularImcRequest } from '../dto/calcular-imc-dto';
+import { ImcRecord } from '../models/imc-record';
 import { ImcService } from './imc.service';
 
 describe('ImcService', () => {
   let service: ImcService;
+  let repository: Repository<ImcRecord>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ImcService],
+      providers: [
+        ImcService,
+        {
+          provide: getRepositoryToken(ImcRecord),
+          useClass: Repository,
+        },
+      ],
     }).compile();
 
     service = module.get<ImcService>(ImcService);
+    repository = module.get<Repository<ImcRecord>>(
+      getRepositoryToken(ImcRecord),
+    );
   });
 
   it('should be defined', () => {
@@ -43,5 +56,22 @@ describe('ImcService', () => {
     const result = service.calcularImc(dto);
     expect(result.imc).toBeCloseTo(32.65, 2);
     expect(result.categoria).toBe('Obeso');
+  });
+
+  it('should save IMC record to the database', async () => {
+    const height = 1.72;
+    const weight = 89.15;
+
+    const imcRecord = new ImcRecord();
+    imcRecord.height = height;
+    imcRecord.weight = weight;
+
+    jest.spyOn(repository, 'create').mockReturnValue(imcRecord);
+    jest.spyOn(repository, 'save').mockResolvedValue(imcRecord);
+
+    const result = await service.saveImcRecord(height, weight);
+    expect(result).toBe(imcRecord);
+    expect(repository.create).toHaveBeenCalledWith({ height, weight });
+    expect(repository.save).toHaveBeenCalledWith(imcRecord);
   });
 });

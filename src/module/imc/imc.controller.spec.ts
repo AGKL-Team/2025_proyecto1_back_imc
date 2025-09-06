@@ -2,7 +2,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CalcularImcRequest } from './dto/calcular-imc-dto';
 import { ImcController } from './imc.controller';
-import { ImcService } from './imc.service';
+import { ImcService } from './services/imc.service';
 
 describe('ImcController', () => {
   let controller: ImcController;
