@@ -20,8 +20,9 @@ El sistema indica en qué rango se encuentra la persona (bajo peso, normal, sobr
 
 > [!NOTE]
 > Para instalar los programas necesarios:
-> Node: [descargar Node](https://nodejs.org/en/download/)
-> Yarn: [descargar yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
+> 
+> - Node: [descargar Node](https://nodejs.org/en/download/)
+> - Yarn: [descargar yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
 
 ## ⚒️ Instalación
 
@@ -62,11 +63,11 @@ vercel login
 
 # Para deploys
 
-## Para un deploy con dominio temporal (Preview)
-## Genera una url específica para la branch
+# Para un deploy con dominio temporal (Preview)
+# Genera una url específica para la branch
 vercel
 
-## Para un deploy con dominio fijo (Production)
+# Para un deploy con dominio fijo (Production)
 vercel --prod
 ```
 
