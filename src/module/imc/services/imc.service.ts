@@ -47,4 +47,13 @@ export class ImcService {
       throw new SaveRecordError((error as Error).message);
     }
   }
+
+  /**
+   * Get all IMC records from the database
+   * @returns Promise<ImcRecord[]>
+   * @fixme filter by user id
+   */
+  async getRecords(userId: number): Promise<ImcRecord[]> {
+    return await this.imcRepository.find({ where: { userId } });
+  }
 }
