@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CalcularImcRequest } from '../dto/calcular-imc-dto';
 import { CalcularImcResponse } from '../dto/calcular-imc-response.interface';
+import { SaveRecordError } from '../errors/save-record-error';
 import { ImcRecord } from '../models/imc-record';
 
 @Injectable()
@@ -35,11 +36,15 @@ export class ImcService {
   }
 
   async saveImcRecord(height: number, weight: number) {
-    const imcRecord = this.imcRepository.create({
-      height,
-      weight,
-    });
+    try {
+      const imcRecord = this.imcRepository.create({
+        height,
+        weight,
+      });
 
-    return await this.imcRepository.save(imcRecord);
+      return await this.imcRepository.save(imcRecord);
+    } catch (error) {
+      throw new SaveRecordError((error as Error).message);
+    }
   }
 }

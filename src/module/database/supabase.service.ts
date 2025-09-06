@@ -10,10 +10,11 @@ export class SupabaseService {
     const supabaseUrl = this.configuration.get<string>('SUPABASE_URL');
     const supabaseKey = this.configuration.get<string>('SUPABASE_KEY');
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error(
-        'SUPABASE_URL and SUPABASE_KEY must be defined in configuration',
-      );
+    if (!supabaseUrl) {
+      throw new Error('SUPABASE_URL must be defined in configuration');
+    }
+    if (!supabaseKey) {
+      throw new Error('SUPABASE_KEY must be defined in configuration');
     }
 
     this.supabase = createClient(supabaseUrl, supabaseKey);

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CalcularImcRequest } from '../dto/calcular-imc-dto';
+import { SaveRecordError } from '../errors/save-record-error';
 import { ImcRecord } from '../models/imc-record';
 import { ImcService } from './imc.service';
 
@@ -73,5 +74,17 @@ describe('ImcService', () => {
     expect(result).toBe(imcRecord);
     expect(repository.create).toHaveBeenCalledWith({ height, weight });
     expect(repository.save).toHaveBeenCalledWith(imcRecord);
+  });
+
+  it('should handle repository save errors gracefully', async () => {
+    const height = 1.75;
+    const weight = 70;
+
+    jest.spyOn(repository, 'create').mockReturnValue(new ImcRecord());
+    jest.spyOn(repository, 'save').mockRejectedValue(new Error('DB error'));
+
+    await expect(service.saveImcRecord(height, weight)).rejects.toThrow(
+      SaveRecordError,
+    );
   });
 });
