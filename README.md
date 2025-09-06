@@ -20,7 +20,7 @@ El sistema indica en qué rango se encuentra la persona (bajo peso, normal, sobr
 
 > [!NOTE]
 > Para instalar los programas necesarios:
-> 
+>
 > - Node: [descargar Node](https://nodejs.org/en/download/)
 > - Yarn: [descargar yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable)
 
