@@ -10,4 +10,9 @@ export class ImcController {
   calcular(@Body(ValidationPipe) data: CalcularImcRequest) {
     return this.imcService.calcularImc(data);
   }
+
+  @Post('save')
+  async save(@Body(ValidationPipe) data: CalcularImcRequest) {
+    return await this.imcService.saveImcRecord(data.altura, data.peso);
+  }
 }

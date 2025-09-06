@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { SupabaseAuthStrategy } from './supabase.strategy';
+import { SupabaseAuthStrategy } from 'nestjs-supabase-auth';
+import { SupabaseStrategy } from './supabase.strategy';
 
 /**
  * Authentication module
@@ -8,7 +9,7 @@ import { SupabaseAuthStrategy } from './supabase.strategy';
  */
 @Module({
   imports: [PassportModule.register({ defaultStrategy: 'supabase' })],
-  providers: [SupabaseAuthStrategy],
-  exports: [PassportModule],
+  providers: [SupabaseAuthStrategy, SupabaseStrategy],
+  exports: [SupabaseStrategy],
 })
 export class AuthModule {}

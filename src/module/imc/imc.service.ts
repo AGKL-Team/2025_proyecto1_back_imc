@@ -1,10 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CalcularImcRequest } from './dto/calcular-imc-dto';
 import { CalcularImcResponse } from './dto/calcular-imc-response.interface';
+import { ImcRecord } from './models/imc-record';
 
 @Injectable()
 export class ImcService {
-  constructor() {}
+  constructor(
+    @InjectRepository(ImcRecord)
+    private readonly imcRepository: Repository<ImcRecord>,
+  ) {}
 
   calcularImc(data: CalcularImcRequest): CalcularImcResponse {
     const { altura, peso } = data;
@@ -28,13 +34,13 @@ export class ImcService {
     return { imc: imcRedondeado, categoria: categoria };
   }
 
-  // private async saveImcRecord(height: number, weight: number) {
-  //   const imcRecord = this.imcRepository.create({
-  //     height,
-  //     weight,
-  //     userId: 0,
-  //   });
+  async saveImcRecord(height: number, weight: number) {
+    const imcRecord = this.imcRepository.create({
+      height,
+      weight,
+      userId: 0,
+    });
 
-  //   return await this.imcRepository.save(imcRecord);
-  // }
+    return await this.imcRepository.save(imcRecord);
+  }
 }

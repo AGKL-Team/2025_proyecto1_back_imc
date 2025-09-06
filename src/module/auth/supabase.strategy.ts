@@ -1,15 +1,19 @@
+import { PassportStrategy } from '@nestjs/passport';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { Request } from 'express';
-import { JwtFromRequestFunction } from 'passport-jwt';
+import { SupabaseAuthStrategy } from 'nestjs-supabase-auth';
+import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt';
 import { Strategy } from 'passport-strategy';
-import { SUPABASE_AUTH, UNAUTHORIZED } from 'src/module/auth/constants';
+import { SUPABASE_AUTH } from 'src/module/auth/constants';
 import { SupabaseAuthStrategyOptions } from './interface/options';
-import { SupabaseAuthUser } from './user';
 
 /**
  * This class is responsible for authenticating users with Supabase.
  */
-export class SupabaseAuthStrategy extends Strategy {
+export class SupabaseStrategy extends PassportStrategy(
+  SupabaseAuthStrategy,
+  'supabase',
+) {
   /* Auth Strategy name */
   readonly name = SUPABASE_AUTH;
   private supabase: SupabaseClient;
@@ -17,13 +21,8 @@ export class SupabaseAuthStrategy extends Strategy {
   success: (user: any, info: any) => void;
   fail: Strategy['fail'];
 
-  constructor(options: SupabaseAuthStrategyOptions) {
-    super();
-    if (!options.extractor) {
-      throw new Error(
-        '\n Extractor is not a function. You should provide an extractor. \n Read the docs: https://github.com/tfarras/nestjs-firebase-auth#readme',
-      );
-    }
+  public constructor(options: SupabaseAuthStrategyOptions) {
+    super({ ...options, extractor: ExtractJwt.fromAuthHeaderAsBearerToken() });
 
     // Initialize Supabase client
     this.supabase = createClient(
@@ -39,16 +38,8 @@ export class SupabaseAuthStrategy extends Strategy {
    * @param payload The JWT payload.
    * @returns The validated user or null.
    */
-  validate(payload: SupabaseAuthUser): SupabaseAuthUser | null {
-    if (payload) {
-      this.success(payload, {});
-
-      return payload;
-    }
-
-    this.fail(UNAUTHORIZED, 401);
-
-    return null;
+  async validate(payload: any): Promise<any> {
+    return Promise.resolve(super.validate(payload));
   }
 
   /**
@@ -56,18 +47,6 @@ export class SupabaseAuthStrategy extends Strategy {
    * @param req The request object.
    */
   authenticate(req: Request) {
-    const idToken: string = this.extractor(req);
-
-    if (!idToken) {
-      this.fail(UNAUTHORIZED, 401);
-      return;
-    }
-
-    this.supabase.auth
-      .getUser(idToken)
-      .then(({ data: { user } }) => this.validate(user!))
-      .catch((err) => {
-        this.fail(err.message, 401);
-      });
+    super.authenticate(req);
   }
 }
