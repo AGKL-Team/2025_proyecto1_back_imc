@@ -8,5 +8,6 @@ import { ImcRecord } from './models/imc-record';
   imports: [TypeOrmModule.forFeature([ImcRecord])],
   controllers: [ImcController],
   providers: [ImcService],
+  exports: [ImcService],
 })
 export class ImcModule {}

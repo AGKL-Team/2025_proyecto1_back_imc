@@ -1,18 +1,13 @@
-import { Global, Module } from '@nestjs/common';
-import { createClient } from '@supabase/supabase-js';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { SupabaseService } from './supabase.service';
 
 /**
  * Database module
  */
-@Global()
 @Module({
-  providers: [
-    {
-      provide: 'SUPABASE_CLIENT',
-      useFactory: () =>
-        createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!),
-    },
-  ],
-  exports: ['SUPABASE_CLIENT'],
+  imports: [ConfigModule],
+  providers: [SupabaseService],
+  exports: [SupabaseService],
 })
 export class DatabaseModule {}

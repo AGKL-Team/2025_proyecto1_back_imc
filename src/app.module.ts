@@ -6,7 +6,6 @@ import { ImcModule } from './module/imc/imc.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './module/auth/auth.module';
 import { DatabaseModule } from './module/database/database.module';
 
 @Module({
@@ -17,10 +16,11 @@ import { DatabaseModule } from './module/database/database.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
+      synchronize: true,
     }),
     // Incluye módulos generales
     DatabaseModule,
-    AuthModule,
+    // AuthModule,
     // Módulos del dominio
     ImcModule,
   ],
