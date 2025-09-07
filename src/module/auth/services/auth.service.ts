@@ -1,9 +1,9 @@
+import { SupabaseService } from '@/module/database/services/supabase.service';
 import { Injectable } from '@nestjs/common';
 import {
   SignUpWithPasswordCredentials,
   SupabaseClient,
 } from '@supabase/supabase-js';
-import { SupabaseService } from 'src/module/database/services/supabase.service';
 
 @Injectable()
 export class AuthService {
