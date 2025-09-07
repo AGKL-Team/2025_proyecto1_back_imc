@@ -1,10 +1,10 @@
+import { CalcularImcRequest } from '@/module/imc/dto/calcular-imc-dto';
+import { SaveRecordError } from '@/module/imc/errors/save-record-error';
+import { ImcRecord } from '@/module/imc/models/imc-record';
+import { ImcService } from '@/module/imc/services/imc.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CalcularImcRequest } from '../dto/calcular-imc-dto';
-import { SaveRecordError } from '../errors/save-record-error';
-import { ImcRecord } from '../models/imc-record';
-import { ImcService } from './imc.service';
 
 describe('ImcService', () => {
   let service: ImcService;

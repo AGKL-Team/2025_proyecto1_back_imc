@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { SupabaseService } from './supabase.service';
+import { SupabaseService } from './services/supabase.service';
 
 /**
  * Database module

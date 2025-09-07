@@ -53,7 +53,7 @@ export class ImcService {
    * @returns Promise<ImcRecord[]>
    * @fixme filter by user id
    */
-  async getRecords(userId: number): Promise<ImcRecord[]> {
+  async getRecords(userId: string): Promise<ImcRecord[]> {
     return await this.imcRepository.find({ where: { userId } });
   }
 }

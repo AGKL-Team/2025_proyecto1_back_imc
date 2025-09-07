@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 
+import { ImcModule } from '../module/imc/imc.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ImcModule } from './module/imc/imc.module';
 
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseModule } from './module/database/database.module';
+import { AuthModule } from '../module/auth/auth.module';
+import { DatabaseModule } from '../module/database/database.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { DatabaseModule } from './module/database/database.module';
     }),
     // Incluye módulos generales
     DatabaseModule,
-    // AuthModule,
+    AuthModule,
     // Módulos del dominio
     ImcModule,
   ],

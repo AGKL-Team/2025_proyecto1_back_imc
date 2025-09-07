@@ -1,11 +1,4 @@
-import { User } from 'src/module/auth/models/user';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('records')
 export class ImcRecord {
@@ -18,11 +11,6 @@ export class ImcRecord {
   @Column('float')
   weight: number;
 
-  @Column('integer')
-  userId: number;
-
-  // Relations
-  @ManyToOne(() => User, (user) => user.imcRecords)
-  @JoinColumn({ name: 'userId' })
-  user: User;
+  @Column('varchar', { length: 36 })
+  userId: string;
 }
