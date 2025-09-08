@@ -16,37 +16,53 @@ export class ImcService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  calcularImc(data: CalcularImcRequest): CalcularImcResponse {
+  async calcularImc(
+    data: CalcularImcRequest,
+    userId: string,
+  ): Promise<CalcularImcResponse> {
     const { altura, peso } = data;
     const imc = peso / (altura * altura);
     const imcRedondeado = Math.round(imc * 100) / 100;
 
-    let categoria: string;
+    let category: string;
     if (imc < 18.5) {
-      categoria = 'Bajo peso';
+      category = 'Bajo peso';
     } else if (imc < 25) {
-      categoria = 'Normal';
+      category = 'Normal';
     } else if (imc < 30) {
-      categoria = 'Sobrepeso';
+      category = 'Sobrepeso';
     } else {
-      categoria = 'Obeso';
+      category = 'Obeso';
     }
 
-    // save into database here
-    // await this.saveImcRecord(altura, peso);
+    await this.saveImcRecord(altura, peso, imcRedondeado, category, userId);
 
-    return { imc: imcRedondeado, categoria: categoria };
+    return { imc: imcRedondeado, categoria: category };
   }
 
-  async saveImcRecord(height: number, weight: number) {
+  async saveImcRecord(
+    height: number,
+    weight: number,
+    imc: number,
+    category: string,
+    userId: string,
+  ) {
     try {
+      const categoryEntity = new Category();
+      categoryEntity.name = category;
+
       const imcRecord = this.imcRepository.create({
         height,
         weight,
+        userId,
+        category: categoryEntity,
+        imc: imc,
+        date: Date.now(),
       });
 
       return await this.imcRepository.save(imcRecord);
     } catch (error) {
+      // TODO: log error
       throw new SaveRecordError((error as Error).message);
     }
   }
