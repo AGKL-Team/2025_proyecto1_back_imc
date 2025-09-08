@@ -64,7 +64,7 @@ export class AuthService {
 
     // ! 2. If there is an error, throw a BadRequestException
     if (response.error) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException(response.error);
     }
 
     // 3. Return the access token and its expiration time
