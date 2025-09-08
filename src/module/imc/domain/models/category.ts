@@ -1,6 +1,7 @@
-import { Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ImcRecord } from './imc-record';
 
+@Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,6 +15,6 @@ export class Category {
   @Column('float')
   max: number;
 
-  @ManyToOne(() => ImcRecord, (record) => record.category)
+  @OneToMany(() => ImcRecord, (record) => record.category)
   records: ImcRecord[];
 }

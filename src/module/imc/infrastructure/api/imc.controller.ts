@@ -1,5 +1,5 @@
-import { UserFromRequest } from '@/module/auth/decorators/user.decorator';
-import { SupabaseAuthGuard } from '@/module/auth/guard/supbase-auth.guard';
+import { UserFromRequest } from '@/module/auth/infrastructure/decorators/user.decorator';
+import { SupabaseAuthGuard } from '@/module/auth/infrastructure/guard/supbase-auth.guard';
 import {
   Body,
   Controller,
@@ -8,8 +8,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from '@supabase/supabase-js';
-import { CalcularImcRequest } from '../dto/calcular-imc-dto';
 import { ImcService } from '../services/imc.service';
+import { CalcularImcRequest } from '../../application/requests/calcular-imc-dto';
 
 @Controller('imc')
 export class ImcController {

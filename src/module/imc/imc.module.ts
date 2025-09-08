@@ -1,11 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ImcController } from './imc.controller';
-import { ImcRecord } from './models/imc-record';
-import { ImcService } from './services/imc.service';
+import { AuthModule } from '../auth/auth.module';
+import { DatabaseModule } from '../database/database.module';
+import { ImcController } from './api/imc.controller';
+import { Category } from './domain/models/category';
+import { ImcRecord } from './domain/models/imc-record';
+import { ImcService } from './infrastructure/services/imc.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ImcRecord])],
+  imports: [
+    TypeOrmModule.forFeature([ImcRecord, Category]),
+    DatabaseModule,
+    AuthModule,
+  ],
   controllers: [ImcController],
   providers: [ImcService],
   exports: [ImcService],

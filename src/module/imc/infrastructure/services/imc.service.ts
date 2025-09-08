@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CalcularImcRequest } from '../dto/calcular-imc-dto';
-import { CalcularImcResponse } from '../dto/calcular-imc-response.interface';
-import { SaveRecordError } from '../errors/save-record-error';
-import { ImcRecord } from '../models/imc-record';
+import { SaveRecordError } from '../../application/errors/save-record-error';
+import { CalcularImcRequest } from '../../application/requests/calcular-imc-dto';
+import { CalcularImcResponse } from '../../application/responses/calcular-imc-response.interface';
+import { Category } from '../../domain/models/category';
+import { ImcRecord } from '../../domain/models/imc-record';
 
 @Injectable()
 export class ImcService {
   constructor(
     @InjectRepository(ImcRecord)
     private readonly imcRepository: Repository<ImcRecord>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   calcularImc(data: CalcularImcRequest): CalcularImcResponse {

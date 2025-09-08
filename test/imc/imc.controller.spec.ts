@@ -1,10 +1,10 @@
-import { ImcController } from '@/module/imc/api/imc.controller';
-import { CalcularImcRequest } from '@/module/imc/dto/calcular-imc-dto';
-import { ImcService } from '@/module/imc/services/imc.service';
+import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-dto';
+import { ImcService } from '@/module/imc/infrastructure/services/imc.service';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';
+import { ImcController } from '@/module/imc/infrastructure/api/imc.controller';
 
 describe('ImcController', () => {
   let controller: ImcController;

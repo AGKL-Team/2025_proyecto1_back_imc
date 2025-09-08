@@ -1,7 +1,8 @@
-import { CalcularImcRequest } from '@/module/imc/dto/calcular-imc-dto';
-import { SaveRecordError } from '@/module/imc/errors/save-record-error';
-import { ImcRecord } from '@/module/imc/models/imc-record';
-import { ImcService } from '@/module/imc/services/imc.service';
+import { SaveRecordError } from '@/module/imc/application/errors/save-record-error';
+import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-dto';
+import { Category } from '@/module/imc/domain/models/category';
+import { ImcRecord } from '@/module/imc/domain/models/imc-record';
+import { ImcService } from '@/module/imc/infrastructure/services/imc.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -16,6 +17,10 @@ describe('ImcService', () => {
         ImcService,
         {
           provide: getRepositoryToken(ImcRecord),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Category),
           useClass: Repository,
         },
       ],
