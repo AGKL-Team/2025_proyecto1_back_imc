@@ -1,7 +1,7 @@
-import { SupabaseAuthGuard } from '@/module/auth/infrastructure/guard/supbase-auth.guard';
-import { SupabaseService } from '@/module/database/services/supabase.service';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseAuthGuard } from '../../src/module/auth/infrastructure/guard/supbase-auth.guard';
+import { SupabaseService } from '../../src/module/database/services/supabase.service';
 
 // ===== Helpers de mocks =====
 function createExecutionContext(request: any): ExecutionContext {

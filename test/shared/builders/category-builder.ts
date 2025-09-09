@@ -1,4 +1,4 @@
-import { Category } from '@/module/imc/domain/models/category';
+import { Category } from '../../../src/module/imc/domain/models/category';
 
 export class CategoryBuilder {
   private readonly category: Category;

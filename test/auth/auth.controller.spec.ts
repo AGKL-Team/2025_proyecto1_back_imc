@@ -1,10 +1,10 @@
-import { SignInRequest } from '@/module/auth/application/requests/sign-in-request';
-import { SignUpRequest } from '@/module/auth/application/requests/sign-up-request';
-import { AuthService } from '@/module/auth/infrastructure/services/auth.service';
-import { AuthController } from '@/module/auth/presentation/api/auth.controller';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { SignInWithPasswordCredentials } from '@supabase/supabase-js';
+import { SignInRequest } from '../../src/module/auth/application/requests/sign-in-request';
+import { SignUpRequest } from '../../src/module/auth/application/requests/sign-up-request';
+import { AuthService } from '../../src/module/auth/infrastructure/services/auth.service';
+import { AuthController } from '../../src/module/auth/presentation/api/auth.controller';
 import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';
 

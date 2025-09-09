@@ -1,4 +1,4 @@
-import { SupabaseService } from '@/module/database/services/supabase.service';
+import { SupabaseService } from '../../../src/module/database/services/supabase.service';
 
 export const SupabaseTestProvider = {
   provide: SupabaseService,

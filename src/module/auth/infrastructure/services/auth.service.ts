@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
+
+import { SupabaseService } from '../../../database/services/supabase.service';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';
 import { ApplicationUserResponse } from '../../application/responses/user-response.interface';
-import { SupabaseService } from 'module/database/services/supabase.service';
 
 @Injectable()
 export class AuthService {

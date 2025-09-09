@@ -1,11 +1,11 @@
-import { SaveRecordError } from '@/module/imc/application/errors/save-record-error';
-import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-request';
-import { Category } from '@/module/imc/domain/models/category';
-import { ImcRecord } from '@/module/imc/domain/models/imc-record';
-import { ImcService } from '@/module/imc/infrastructure/services/imc.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { SaveRecordError } from '../../src/module/imc/application/errors/save-record-error';
+import { CalcularImcRequest } from '../../src/module/imc/application/requests/calcular-imc-request';
+import { Category } from '../../src/module/imc/domain/models/category';
+import { ImcRecord } from '../../src/module/imc/domain/models/imc-record';
+import { ImcService } from '../../src/module/imc/infrastructure/services/imc.service';
 import { CategoryBuilder } from '../shared/builders/category-builder';
 import { fakeImcRecord } from '../shared/fakes/imc.fake';
 import { fakeApplicationUser } from '../shared/fakes/user.fake';

@@ -1,9 +1,9 @@
-import { SignInRequest } from '@/module/auth/application/requests/sign-in-request';
-import { SignUpRequest } from '@/module/auth/application/requests/sign-up-request';
-import { AuthService } from '@/module/auth/infrastructure/services/auth.service';
-import { SupabaseService } from '@/module/database/services/supabase.service';
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { SignInRequest } from '../../src/module/auth/application/requests/sign-in-request';
+import { SignUpRequest } from '../../src/module/auth/application/requests/sign-up-request';
+import { AuthService } from '../../src/module/auth/infrastructure/services/auth.service';
+import { SupabaseService } from '../../src/module/database/services/supabase.service';
 
 describe('AuthService', () => {
   let service: AuthService;

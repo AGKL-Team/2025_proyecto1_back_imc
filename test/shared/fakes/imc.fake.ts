@@ -1,4 +1,4 @@
-import { ImcRecord } from '@/module/imc/domain/models/imc-record';
+import { ImcRecord } from '../../../src/module/imc/domain/models/imc-record';
 import { categoryFake } from './category.fake';
 
 export const fakeImcRecord: ImcRecord = {

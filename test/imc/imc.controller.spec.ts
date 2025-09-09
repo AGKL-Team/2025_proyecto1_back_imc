@@ -1,9 +1,9 @@
-import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-request';
-import { ImcService } from '@/module/imc/infrastructure/services/imc.service';
-import { ImcController } from '@/module/imc/presentation/api/imc.controller';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@supabase/supabase-js';
+import { CalcularImcRequest } from '../../src/module/imc/application/requests/calcular-imc-request';
+import { ImcService } from '../../src/module/imc/infrastructure/services/imc.service';
+import { ImcController } from '../../src/module/imc/presentation/api/imc.controller';
 import { fakeApplicationUser } from '../shared/fakes/user.fake';
 import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';

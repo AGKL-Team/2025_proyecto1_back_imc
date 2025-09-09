@@ -1,6 +1,6 @@
-import { SupabaseService } from '@/module/database/services/supabase.service';
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { SupabaseService } from '../../src/module/database/services/supabase.service';
 
 describe('SupabaseService', () => {
   let service: SupabaseService;
