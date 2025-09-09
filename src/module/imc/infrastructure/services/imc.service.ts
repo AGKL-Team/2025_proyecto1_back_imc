@@ -1,6 +1,6 @@
-import { Category } from '@/module/imc/domain/models/category';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Category } from 'module/imc/domain/models/category';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { SaveRecordError } from '../../application/errors/save-record-error';
 import { CalcularImcRequest } from '../../application/requests/calcular-imc-request';

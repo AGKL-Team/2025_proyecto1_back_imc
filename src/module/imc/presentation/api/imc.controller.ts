@@ -1,5 +1,3 @@
-import { UserFromRequest } from '@/module/auth/infrastructure/decorators/user.decorator';
-import { SupabaseAuthGuard } from '@/module/auth/infrastructure/guard/supbase-auth.guard';
 import {
   Body,
   Controller,
@@ -10,6 +8,8 @@ import {
 import { User } from '@supabase/supabase-js';
 import { CalcularImcRequest } from '../../application/requests/calcular-imc-request';
 import { ImcService } from '../../infrastructure/services/imc.service';
+import { UserFromRequest } from 'module/auth/infrastructure/decorators/user.decorator';
+import { SupabaseAuthGuard } from 'module/auth/infrastructure/guard/supbase-auth.guard';
 
 @Controller('imc')
 export class ImcController {
