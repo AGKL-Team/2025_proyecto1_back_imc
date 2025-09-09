@@ -1,4 +1,4 @@
-import { createApp } from '../src/bootstrap';
+import { createApp } from '@/bootstrap';
 
 let server: any;
 
