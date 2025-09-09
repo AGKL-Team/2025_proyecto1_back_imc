@@ -7,4 +7,5 @@ async function bootstrap() {
   });
 }
 
-void bootstrap();
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+bootstrap();
