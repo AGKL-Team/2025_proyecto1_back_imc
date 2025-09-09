@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Category } from '@/module/imc/domain/models/category';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { SaveRecordError } from '../../application/errors/save-record-error';
-import { CalcularImcRequest } from '../../application/requests/calcular-imc-dto';
+import { CalcularImcRequest } from '../../application/requests/calcular-imc-request';
 import { CalcularImcResponse } from '../../application/responses/calcular-imc-response.interface';
-import { Category } from '../../domain/models/category';
 import { ImcRecord } from '../../domain/models/imc-record';
 
 @Injectable()
@@ -20,44 +20,37 @@ export class ImcService {
     data: CalcularImcRequest,
     userId: string,
   ): Promise<CalcularImcResponse> {
-    const { altura, peso } = data;
-    const imc = peso / (altura * altura);
+    const { height, weight } = data;
+    const imc = weight / (height * height);
     const imcRedondeado = Math.round(imc * 100) / 100;
 
-    let category: string;
-    if (imc < 18.5) {
-      category = 'Bajo peso';
-    } else if (imc < 25) {
-      category = 'Normal';
-    } else if (imc < 30) {
-      category = 'Sobrepeso';
-    } else {
-      category = 'Obeso';
-    }
+    const category = await this.categoryRepository.findOne({
+      where: { min: LessThanOrEqual(imc), max: MoreThanOrEqual(imc) },
+    });
 
-    await this.saveImcRecord(altura, peso, imcRedondeado, category, userId);
+    if (!category)
+      throw new NotFoundException('No category found for this IMC');
 
-    return { imc: imcRedondeado, categoria: category };
+    await this.saveImcRecord(height, weight, imcRedondeado, category, userId);
+
+    return { imc: imcRedondeado, category: category.name };
   }
 
   async saveImcRecord(
     height: number,
     weight: number,
     imc: number,
-    category: string,
+    category: Category,
     userId: string,
   ) {
     try {
-      const categoryEntity = new Category();
-      categoryEntity.name = category;
-
       const imcRecord = this.imcRepository.create({
         height,
         weight,
         userId,
-        category: categoryEntity,
+        category: { id: category.id },
         imc: imc,
-        date: Date.now(),
+        date: new Date(),
       });
 
       return await this.imcRepository.save(imcRecord);

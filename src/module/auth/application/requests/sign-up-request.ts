@@ -1,4 +1,4 @@
-export interface SignUpRequest {
+export class SignUpRequest {
   /** The user's email address. */
   email: string;
   /** The user's password. */

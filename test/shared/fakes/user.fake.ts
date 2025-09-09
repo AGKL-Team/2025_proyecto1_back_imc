@@ -1,6 +1,6 @@
 import { User } from '@supabase/supabase-js';
 
-export const FakeApplicationUser: User = {
+export const fakeApplicationUser: User = {
   id: 'someValidUUID',
   app_metadata: {},
   user_metadata: {},

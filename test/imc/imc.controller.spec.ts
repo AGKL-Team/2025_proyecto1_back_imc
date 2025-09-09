@@ -1,10 +1,10 @@
-import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-dto';
+import { CalcularImcRequest } from '@/module/imc/application/requests/calcular-imc-request';
 import { ImcService } from '@/module/imc/infrastructure/services/imc.service';
 import { ImcController } from '@/module/imc/presentation/api/imc.controller';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@supabase/supabase-js';
-import { FakeApplicationUser } from '../shared/fakes/user.fake';
+import { fakeApplicationUser } from '../shared/fakes/user.fake';
 import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';
 
@@ -36,21 +36,21 @@ describe('ImcController', () => {
   });
 
   it('should return IMC and category for valid input', async () => {
-    const dto: CalcularImcRequest = { altura: 1.75, peso: 70 };
+    const dto: CalcularImcRequest = { height: 1.75, weight: 70 };
 
     jest
       .spyOn(service, 'calcularImc')
-      .mockResolvedValue({ imc: 22.86, categoria: 'Normal' });
+      .mockResolvedValue({ imc: 22.86, category: 'Normal' });
 
-    const user: User = FakeApplicationUser;
+    const user: User = fakeApplicationUser;
 
     const result = await controller.calcular(dto, user);
-    expect(result).toEqual({ imc: 22.86, categoria: 'Normal' });
+    expect(result).toEqual({ imc: 22.86, category: 'Normal' });
     expect(service.calcularImc).toHaveBeenCalledWith(dto, user.id);
   });
 
   it('should throw BadRequestException for invalid input', async () => {
-    const invalidDto: CalcularImcRequest = { altura: -1, peso: 70 };
+    const invalidDto: CalcularImcRequest = { height: -1, weight: 70 };
 
     // Aplicar ValidationPipe manualmente en la prueba
     const validationPipe = new ValidationPipe({

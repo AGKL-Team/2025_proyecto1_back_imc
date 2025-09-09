@@ -1,5 +1,5 @@
 import { Injectable, PipeTransform } from '@nestjs/common';
-import { SignUpRequest } from '../../application/requests/sign-up-request.interface';
+import { SignUpRequest } from '../../application/requests/sign-up-request';
 
 @Injectable()
 export class SignUpPipe implements PipeTransform<SignUpRequest> {

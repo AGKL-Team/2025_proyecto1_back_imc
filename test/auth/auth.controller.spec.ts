@@ -1,4 +1,5 @@
-import { SignInRequest } from '@/module/auth/application/requests/sign-in-request.interface';
+import { SignInRequest } from '@/module/auth/application/requests/sign-in-request';
+import { SignUpRequest } from '@/module/auth/application/requests/sign-up-request';
 import { AuthService } from '@/module/auth/infrastructure/services/auth.service';
 import { AuthController } from '@/module/auth/presentation/api/auth.controller';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
@@ -95,15 +96,123 @@ describe('AuthController', () => {
     expect(service.signIn).not.toHaveBeenCalled();
   });
 
-  it('should handle sign in with an unextisting email and return an error', async () => {});
+  it('should handle sign in with an unextisting email and return an error', async () => {
+    // Arrange
+    const request: SignInWithPasswordCredentials = {
+      email: 'test@gmail.com',
+      password: 'MyStrongPassword123',
+    };
+
+    jest
+      .spyOn(service, 'signIn')
+      .mockRejectedValue(new Error('User not found'));
+
+    // Act
+    const result = controller.signIn(request);
+
+    // Assert
+    await expect(result).rejects.toThrow('User not found');
+    expect(service.signIn).toHaveBeenCalledWith(request);
+  });
 
   // ======= SIGN OUT =======
-  it('should sign out the currently authenticated user', async () => {});
-  it('should handle sign out when no user is authenticated', async () => {});
-  it('should handle sign out with expired tokens and return an error', async () => {});
+  it('should sign out the currently authenticated user', async () => {
+    // Arrange
+    jest.spyOn(service, 'signOut').mockResolvedValue({} as any);
+
+    // Act
+    const result = await controller.signOut();
+
+    // Assert
+    expect(result).toEqual({} as any);
+    expect(service.signOut).toHaveBeenCalled();
+  });
+
+  it('should handle sign out when no user is authenticated', async () => {
+    // Arrange
+    jest
+      .spyOn(service, 'signOut')
+      .mockRejectedValue(new Error('No user authenticated'));
+
+    // Act
+    const result = controller.signOut();
+
+    // Assert
+    await expect(result).rejects.toThrow('No user authenticated');
+    expect(service.signOut).toHaveBeenCalled();
+  });
+
+  it('should handle sign out with expired tokens and return an error', async () => {
+    // Arrange
+    jest
+      .spyOn(service, 'signOut')
+      .mockRejectedValue(new Error('Token expired'));
+
+    // Act
+    const result = controller.signOut();
+
+    // Assert
+    await expect(result).rejects.toThrow('Token expired');
+    expect(service.signOut).toHaveBeenCalled();
+  });
 
   // ======= SIGN UP =======
-  it('should sign up a new user and return user data with a token', async () => {});
-  it('should handle sign up with an already registered email and return an error', async () => {});
-  it('should handle sign up when the password is too weak and return a validation error', async () => {});
+  it('should sign up a new user and return user data with a token', async () => {
+    // Arrange
+    const request = {
+      email: 'test@gmail.com',
+      password: 'MyStrongPassword123',
+    };
+
+    jest.spyOn(service, 'signUp').mockResolvedValue({} as any);
+
+    // Act
+    const result = await controller.signUp(request);
+
+    // Assert
+    expect(result).toEqual({} as any);
+    expect(service.signUp).toHaveBeenCalledWith(request);
+  });
+
+  it('should handle sign up with an already registered email and return an error', async () => {
+    // Arrange
+    const request: SignUpRequest = {
+      email: 'test@gmail.com',
+      password: 'MyStrongPassword123',
+    };
+
+    jest
+      .spyOn(service, 'signUp')
+      .mockRejectedValue(new Error('User already exists'));
+
+    // Act
+    const result = controller.signUp(request);
+
+    // Assert
+    await expect(result).rejects.toThrow('User already exists');
+    expect(service.signUp).toHaveBeenCalledWith(request);
+  });
+
+  it('should handle sign up when the password is too weak and return a validation error', async () => {
+    // Arrange
+    const request: SignUpRequest = {
+      email: 'test@gmail.com',
+      password: 'weak',
+    };
+
+    const validationPipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    });
+
+    // Act
+    const result = validationPipe.transform(request, {
+      type: 'body',
+      metatype: SignUpRequest,
+    });
+
+    // Assert
+    await expect(result).rejects.toThrow(BadRequestException);
+    expect(service.signUp).not.toHaveBeenCalled();
+  });
 });

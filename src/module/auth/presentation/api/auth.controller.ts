@@ -7,8 +7,8 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { SignInRequest } from '../../application/requests/sign-in-request.interface';
-import { SignUpRequest } from '../../application/requests/sign-up-request.interface';
+import { SignInRequest } from '../../application/requests/sign-in-request';
+import { SignUpRequest } from '../../application/requests/sign-up-request';
 import { SupabaseAuthGuard } from '../../infrastructure/guard/supbase-auth.guard';
 import { AuthService } from '../../infrastructure/services/auth.service';
 

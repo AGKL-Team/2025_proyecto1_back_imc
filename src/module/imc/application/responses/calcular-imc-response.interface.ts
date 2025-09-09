@@ -1,4 +1,4 @@
 export interface CalcularImcResponse {
   imc: number;
-  categoria: string;
+  category: string;
 }

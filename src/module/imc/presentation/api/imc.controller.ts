@@ -8,7 +8,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from '@supabase/supabase-js';
-import { CalcularImcRequest } from '../../application/requests/calcular-imc-dto';
+import { CalcularImcRequest } from '../../application/requests/calcular-imc-request';
 import { ImcService } from '../../infrastructure/services/imc.service';
 
 @Controller('imc')
