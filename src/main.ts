@@ -1,6 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from 'application/app.module';
+import { AppModule } from './application/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,9 +15,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(3000, () => {
-    console.log('🚀 Server running');
-  });
+  await app.listen(3000);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
