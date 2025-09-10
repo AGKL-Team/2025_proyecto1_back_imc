@@ -6,8 +6,6 @@ import { AppService } from './app.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigurationModule } from 'config/configuration.module';
-import { AuthModule } from '../module/auth/auth.module';
-import { DatabaseModule } from '../module/database/database.module';
 
 @Module({
   imports: [
@@ -20,8 +18,8 @@ import { DatabaseModule } from '../module/database/database.module';
       synchronize: true,
     }),
     // Incluye módulos generales
-    DatabaseModule,
-    AuthModule,
+    // DatabaseModule,
+    // AuthModule,
     // Módulos del dominio
     ImcModule,
   ],
