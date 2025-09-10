@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseConfig } from 'config/supabase.config';
 
 @Injectable()
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  constructor(private readonly configuration: ConfigService) {
-    const supabaseUrl = this.configuration.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configuration.get<string>('SUPABASE_KEY');
+  constructor(private readonly configService: ConfigService) {
+    const supabaseConfig = this.configService.get<SupabaseConfig>('supabase');
 
-    if (!supabaseUrl) {
-      throw new Error('SUPABASE_URL must be defined in configuration');
-    }
-    if (!supabaseKey) {
-      throw new Error('SUPABASE_KEY must be defined in configuration');
-    }
+    if (!supabaseConfig?.url) throw new Error('SUPABASE_URL must be defined');
+    if (!supabaseConfig?.key) throw new Error('SUPABASE_KEY must be defined');
 
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.supabase = createClient(supabaseConfig.url, supabaseConfig.key);
   }
 
   getClient(): SupabaseClient {

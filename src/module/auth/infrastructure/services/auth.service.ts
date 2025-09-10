@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+import { FrontendConfig } from 'config/frontent.config';
 import { SupabaseService } from '../../../database/services/supabase.service';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';
@@ -9,9 +11,19 @@ import { ApplicationUserResponse } from '../../application/responses/user-respon
 @Injectable()
 export class AuthService {
   private readonly supabaseClient: SupabaseClient;
+  private readonly frontendUrl: string;
 
-  constructor(private readonly supabaseService: SupabaseService) {
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly configService: ConfigService,
+  ) {
     this.supabaseClient = this.supabaseService.getClient();
+
+    const frontendConfig = this.configService.get<FrontendConfig>('frontend');
+
+    if (!frontendConfig?.url) throw new Error('FRONTEND_URL must be defined');
+
+    this.frontendUrl = frontendConfig.url;
   }
 
   /**
@@ -33,13 +45,9 @@ export class AuthService {
     }
 
     // 1. Set the redirection url when the user confirms their email
-    const frontendUrl = process.env.FRONTEND_URL;
-    if (!frontendUrl) {
-      throw new Error('FRONTEND_URL is not defined');
-    }
     credentials.options = {
       ...credentials.options,
-      emailRedirectTo: `${frontendUrl}/auth/email-confirmed`,
+      emailRedirectTo: `${this.frontendUrl}/auth/email-confirmed`,
     };
 
     // 2. Create a new user with email and password

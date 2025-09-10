@@ -4,14 +4,14 @@ import { ImcModule } from '../module/imc/imc.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigurationModule } from 'config/configuration.module';
 import { AuthModule } from '../module/auth/auth.module';
 import { DatabaseModule } from '../module/database/database.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigurationModule,
     // Configuración de TypeOrm
     TypeOrmModule.forRoot({
       type: 'postgres',
