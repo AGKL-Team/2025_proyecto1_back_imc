@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-import { FrontendConfig } from 'config/frontent.config';
+import { FrontendConfig } from '../../../../config/frontent.config';
 import { SupabaseService } from '../../../database/services/supabase.service';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';

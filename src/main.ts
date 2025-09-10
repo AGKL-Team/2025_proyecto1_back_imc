@@ -15,8 +15,6 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
 
-  // Inicialización de la app (no listen)
-  await app.init();
   await app.listen(3000);
 }
 

@@ -6,10 +6,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from '@supabase/supabase-js';
+import { UserFromRequest } from '../../../auth/infrastructure/decorators/user.decorator';
+import { SupabaseAuthGuard } from '../../../auth/infrastructure/guard/supbase-auth.guard';
 import { CalcularImcRequest } from '../../application/requests/calcular-imc-request';
 import { ImcService } from '../../infrastructure/services/imc.service';
-import { UserFromRequest } from 'module/auth/infrastructure/decorators/user.decorator';
-import { SupabaseAuthGuard } from 'module/auth/infrastructure/guard/supbase-auth.guard';
 
 @Controller('imc')
 export class ImcController {
