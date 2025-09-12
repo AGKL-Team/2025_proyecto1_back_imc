@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -29,6 +30,7 @@ describe('ImcService', () => {
           provide: getRepositoryToken(Category),
           useClass: Repository,
         },
+        Logger,
       ],
     }).compile();
 
