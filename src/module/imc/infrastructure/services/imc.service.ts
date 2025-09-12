@@ -61,11 +61,35 @@ export class ImcService {
   }
 
   /**
-   * Get all IMC records from the database
+   * Get all IMC records from the database for a specific user and optional date range.
+   * @param userId string
+   * @param startDate Date | undefined
+   * @param endDate Date | undefined
    * @returns Promise<ImcRecord[]>
    * @fixme filter by user id
    */
-  async getRecords(userId: string): Promise<ImcRecord[]> {
-    return await this.imcRepository.find({ where: { userId } });
+  async getRecords(
+    userId: string,
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<ImcRecord[]> {
+    // Create the base query
+    const query = this.imcRepository
+      .createQueryBuilder('imc')
+      .where('imc.userId = :userId', { userId })
+      .leftJoinAndSelect('imc.category', 'category')
+      .orderBy('imc.date', 'ASC');
+
+    // Add date filters if provided
+    if (startDate) {
+      query.andWhere('imc.date >= :startDate', { startDate });
+    }
+
+    // Add date filters if provided
+    if (endDate) {
+      query.andWhere('imc.date <= :endDate', { endDate });
+    }
+
+    return await query.getMany();
   }
 }

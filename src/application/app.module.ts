@@ -6,6 +6,8 @@ import { AppService } from './app.service';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigurationModule } from '../config/configuration.module';
+import { AuthModule } from '../module/auth/auth.module';
+import { DatabaseModule } from '../module/database/database.module';
 
 @Module({
   imports: [
@@ -13,18 +15,16 @@ import { ConfigurationModule } from '../config/configuration.module';
     // Configuración de TypeOrm
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT!),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      ssl: { rejectUnauthorized: false }, // obligatorio en Supabase
+      url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: process.env.NODE_ENV === 'dev',
+      ssl: {
+        rejectUnauthorized: false,
+      },
     }),
     // Incluye módulos generales
-    // DatabaseModule,
-    // AuthModule,
+    DatabaseModule,
+    AuthModule,
     // Módulos del dominio
     ImcModule,
   ],
