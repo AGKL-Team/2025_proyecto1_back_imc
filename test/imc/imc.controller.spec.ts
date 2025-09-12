@@ -75,12 +75,16 @@ describe('ImcController', () => {
 
   // ========== History Tests ==========
 
-  it('should return IMC history for valid user', async () => {
+  it('should return IMC history for valid user without date filters', async () => {
+    // Arrange
     const user: User = fakeApplicationUser;
 
     jest.spyOn(service, 'getRecords').mockResolvedValue([]);
 
+    // Act
     const result = await controller.getHistory(user, {});
+
+    // Assert
     expect(result).toEqual([]);
     expect(service.getRecords).toHaveBeenCalledWith(
       user.id,
@@ -90,17 +94,20 @@ describe('ImcController', () => {
   });
 
   it('should return IMC history with date filters', async () => {
+    // Arrange
     const user: User = fakeApplicationUser;
     const from = new Date('2025-01-01');
     const to = new Date('2025-01-31');
 
     jest.spyOn(service, 'getRecords').mockResolvedValue([]);
 
+    // Act
     const result = await controller.getHistory(user, {
       startDate: from.toISOString(),
       endDate: to.toISOString(),
     });
 
+    // Assert
     expect(result).toEqual([]);
     expect(service.getRecords).toHaveBeenCalledWith(user.id, from, to);
   });
@@ -116,6 +123,7 @@ describe('ImcController', () => {
       transform: true,
     });
 
+    // Act
     await expect(
       validationPipe.transform(
         { startDate: invalidStartDate, endDate: invalidEndDate },
@@ -126,19 +134,22 @@ describe('ImcController', () => {
       ),
     ).rejects.toThrow(BadRequestException);
 
-    // Verificar que el servicio no se llama porque la validación falla antes
+    // Assert
     expect(service.getRecords).not.toHaveBeenCalled();
   });
 
   it('should throw BadRequestException if startDate is after endDate', async () => {
+    // Arrange
     const user: User = fakeApplicationUser;
     const startDate = '2025-02-01';
     const endDate = '2025-01-01';
 
     jest.spyOn(service, 'getRecords').mockResolvedValue([]);
 
+    // Act
     const result = controller.getHistory(user, { startDate, endDate });
 
+    // Assert
     await expect(result).rejects.toThrow(BadRequestException);
     expect(service.getRecords).not.toHaveBeenCalled();
   });

@@ -73,12 +73,17 @@ export class ImcService {
     startDate?: Date,
     endDate?: Date,
   ): Promise<ImcRecord[]> {
+    // Validate the cronology of the dates
+    if (startDate && endDate && startDate > endDate) {
+      throw new Error('The start date must be earlier than the end date.');
+    }
+
     // Create the base query
     const query = this.imcRepository
       .createQueryBuilder('imc')
       .where('imc.userId = :userId', { userId })
       .leftJoinAndSelect('imc.category', 'category')
-      .orderBy('imc.date', 'ASC');
+      .orderBy('imc.date', 'DESC');
 
     // Add date filters if provided
     if (startDate) {

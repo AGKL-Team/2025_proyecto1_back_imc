@@ -15,6 +15,7 @@ describe('ImcService', () => {
   let service: ImcService;
   let imcRepository: Repository<ImcRecord>;
   let categoryRepository: Repository<Category>;
+  let queryBuilder: any;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,10 +23,6 @@ describe('ImcService', () => {
         ImcService,
         {
           provide: getRepositoryToken(ImcRecord),
-          useClass: Repository,
-        },
-        {
-          provide: getRepositoryToken(Category),
           useClass: Repository,
         },
         {
@@ -42,6 +39,18 @@ describe('ImcService', () => {
     categoryRepository = module.get<Repository<Category>>(
       getRepositoryToken(Category),
     );
+    queryBuilder = {
+      where: jest.fn().mockReturnThis(),
+      leftJoinAndSelect: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([fakeImcRecord]),
+    };
+
+    imcRepository.createQueryBuilder = jest.fn();
+    (imcRepository.createQueryBuilder as jest.Mock).mockReturnValue(
+      queryBuilder,
+    );
   });
 
   it('should be defined', () => {
@@ -49,6 +58,8 @@ describe('ImcService', () => {
     expect(imcRepository).toBeDefined();
     expect(categoryRepository).toBeDefined();
   });
+
+  // ===== Calculate IMC Tests =====
 
   it('should calculate IMC correctly', async () => {
     // Arrange
@@ -131,6 +142,8 @@ describe('ImcService', () => {
     expect(result.imc).toBe(imcRecord.imc);
   });
 
+  // ===== Save IMC Record Tests =====
+
   it('should save IMC record to the database', async () => {
     // Arrange
     const imcRecord = fakeImcRecord;
@@ -167,5 +180,160 @@ describe('ImcService', () => {
     await expect(
       service.saveImcRecord(imc.height, imc.weight, imc.imc, category, user.id),
     ).rejects.toThrow(SaveRecordError);
+  });
+
+  // ===== Get History IMC Records Tests =====
+
+  it('should return IMC history for a user', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const imcRecords: ImcRecord[] = [
+      fakeImcRecord,
+      { ...fakeImcRecord, id: 2 },
+    ];
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue(imcRecords);
+
+    // Act
+    const result = await service.getRecords(user.id);
+
+    // Assert
+    expect(result).toBe(imcRecords);
+    expect(queryBuilder.where).toHaveBeenCalledWith('imc.userId = :userId', {
+      userId: user.id,
+    });
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should return IMC history for a user within a date range', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const startDate = new Date('2025-01-01');
+    const endDate = new Date('2025-12-31');
+    const imcRecords: ImcRecord[] = [
+      { ...fakeImcRecord, date: new Date('2025-06-15') },
+      { ...fakeImcRecord, id: 2, date: new Date('2025-11-20') },
+    ];
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue(imcRecords);
+
+    // Act
+    const result = await service.getRecords(user.id, startDate, endDate);
+
+    // Assert
+    expect(result).toEqual(imcRecords);
+    expect(queryBuilder.andWhere).toHaveBeenCalledTimes(2);
+    expect(queryBuilder.where).toHaveBeenCalledWith('imc.userId = :userId', {
+      userId: user.id,
+    });
+    expect(queryBuilder.andWhere).toHaveBeenNthCalledWith(
+      1,
+      'imc.date >= :startDate',
+      { startDate },
+    );
+    expect(queryBuilder.andWhere).toHaveBeenNthCalledWith(
+      2,
+      'imc.date <= :endDate',
+      { endDate },
+    );
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should return an empty array if no IMC records found', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue([]);
+
+    // Act
+    const result = await service.getRecords(user.id);
+
+    // Assert
+    expect(result).toEqual([]);
+    expect(queryBuilder.where).toHaveBeenCalledWith('imc.userId = :userId', {
+      userId: user.id,
+    });
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should return IMC records ordered by date descending', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const imcRecords: ImcRecord[] = [
+      { ...fakeImcRecord, date: new Date('2025-06-15') },
+      { ...fakeImcRecord, id: 2, date: new Date('2025-11-20') },
+      { ...fakeImcRecord, id: 3, date: new Date('2025-01-10') },
+    ];
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue(imcRecords);
+
+    // Act
+    const result = await service.getRecords(user.id);
+
+    // Assert
+    expect(result).toBe(imcRecords);
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('imc.date', 'DESC');
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should return IMC records with start date but no end date', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const startDate = new Date('2025-01-01');
+    const imcRecords: ImcRecord[] = [
+      { ...fakeImcRecord, date: new Date('2025-06-15') },
+      { ...fakeImcRecord, id: 2, date: new Date('2025-11-20') },
+    ];
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue(imcRecords);
+
+    // Act
+    const result = await service.getRecords(user.id, startDate);
+
+    // Assert
+    expect(result).toBe(imcRecords);
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+      'imc.date >= :startDate',
+      { startDate },
+    );
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should return IMC records with end date but no start date', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const endDate = new Date('2025-12-31');
+    const imcRecords: ImcRecord[] = [
+      { ...fakeImcRecord, date: new Date('2025-06-15') },
+      { ...fakeImcRecord, id: 2, date: new Date('2025-11-20') },
+    ];
+
+    jest.spyOn(queryBuilder, 'getMany').mockResolvedValue(imcRecords);
+
+    // Act
+    const result = await service.getRecords(user.id, undefined, endDate);
+
+    // Assert
+    expect(result).toBe(imcRecords);
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith('imc.date <= :endDate', {
+      endDate,
+    });
+    expect(queryBuilder.getMany).toHaveBeenCalled();
+  });
+
+  it('should handle error when endDate is before startDate', async () => {
+    // Arrange
+    const user = fakeApplicationUser;
+    const startDate = new Date('2025-12-31');
+    const endDate = new Date('2025-01-01');
+
+    // Act & Assert
+    await expect(
+      service.getRecords(user.id, startDate, endDate),
+    ).rejects.toThrow('The start date must be earlier than the end date.');
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 });
