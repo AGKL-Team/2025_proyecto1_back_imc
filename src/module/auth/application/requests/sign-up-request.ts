@@ -1,7 +1,12 @@
+import { IsEmail, IsNotEmpty } from 'class-validator';
+
 export class SignUpRequest {
   /** The user's email address. */
+  @IsEmail()
+  @IsNotEmpty()
   email: string;
   /** The user's password. */
+  @IsNotEmpty()
   password: string;
   options?: {
     /** The redirect url embedded in the email link */

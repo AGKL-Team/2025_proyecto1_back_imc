@@ -33,12 +33,13 @@ export class AuthService {
    */
   async signUp(credentials: SignUpRequest) {
     // ! Ensure the user not exists
-    const userExists = Boolean(
-      await this.supabaseClient.rpc('sql', {
-        query: 'SELECT 1 FROM auth.users WHERE email = ?',
-        params: [credentials.email],
-      }),
-    );
+    const query = await this.supabaseClient.rpc('sql', {
+      query: 'SELECT 1 FROM auth.users WHERE email = ?',
+      params: [credentials.email],
+    });
+
+    // Ensure the query was successful
+    const userExists = Boolean(query.data);
 
     if (userExists) {
       throw new BadRequestException('User already exists');
