@@ -78,6 +78,7 @@ export class AuthService {
     return {
       access_token: response.data.session.access_token,
       expires_in: response.data.session.expires_in,
+      email: response.data.user.email,
     } as ApplicationUserResponse;
   }
 

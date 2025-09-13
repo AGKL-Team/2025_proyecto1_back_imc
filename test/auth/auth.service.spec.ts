@@ -109,7 +109,15 @@ describe('AuthService', () => {
   // ======= SIGN IN =======
   it('should sign in a user successfully', async () => {
     supabaseClient.auth.signInWithPassword.mockResolvedValue({
-      data: { session: { access_token: 'token', expires_in: 3600 } },
+      data: {
+        session: {
+          access_token: 'token',
+          expires_in: 3600,
+        },
+        user: {
+          email: 'test@test.com',
+        },
+      },
       error: null,
     });
 
@@ -119,7 +127,11 @@ describe('AuthService', () => {
     };
     const result = await service.signIn(request);
 
-    expect(result).toEqual({ access_token: 'token', expires_in: 3600 });
+    expect(result).toEqual({
+      access_token: 'token',
+      expires_in: 3600,
+      email: request.email,
+    });
     expect(supabaseClient.auth.signInWithPassword).toHaveBeenCalledWith(
       request,
     );
