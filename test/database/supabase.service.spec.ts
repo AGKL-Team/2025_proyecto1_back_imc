@@ -1,6 +1,8 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseService } from '../../src/module/database/services/supabase.service';
+import { ConfigTestProvider } from '../shared/providers/config-test.provider';
+import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';
 
 describe('SupabaseService', () => {
   let service: SupabaseService;
@@ -12,7 +14,7 @@ describe('SupabaseService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule],
-      providers: [SupabaseService],
+      providers: [SupabaseService, SupabaseTestProvider, ConfigTestProvider],
     }).compile();
 
     service = module.get<SupabaseService>(SupabaseService);
@@ -28,10 +30,11 @@ describe('SupabaseService', () => {
 
   it('should throw error if SUPABASE_URL is missing', async () => {
     process.env.SUPABASE_URL = '';
+    process.env.SUPABASE_KEY = 'fake-key';
     await expect(
       Test.createTestingModule({
         imports: [ConfigModule],
-        providers: [SupabaseService],
+        providers: [SupabaseService, ConfigTestProvider],
       })
         .compile()
         .then((module) => {
@@ -43,11 +46,12 @@ describe('SupabaseService', () => {
   });
 
   it('should throw error if SUPABASE_KEY is missing', async () => {
+    process.env.SUPABASE_URL = 'https://fake-url.supabase.co';
     process.env.SUPABASE_KEY = '';
     await expect(
       Test.createTestingModule({
         imports: [ConfigModule],
-        providers: [SupabaseService],
+        providers: [SupabaseService, ConfigTestProvider],
       })
         .compile()
         .then((module) => {

@@ -15,7 +15,7 @@ export class ImcRecord {
   @Column('float')
   imc: number;
 
-  @Column('date')
+  @Column('timestamptz')
   date: Date;
 
   @ManyToOne(() => Category, (category) => category.records, { eager: true })

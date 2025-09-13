@@ -10,8 +10,10 @@ export class SupabaseService {
   constructor(private readonly configService: ConfigService) {
     const supabaseConfig = this.configService.get<SupabaseConfig>('supabase');
 
-    if (!supabaseConfig?.url) throw new Error('SUPABASE_URL must be defined');
-    if (!supabaseConfig?.key) throw new Error('SUPABASE_KEY must be defined');
+    if (!supabaseConfig?.url)
+      throw new Error('SUPABASE_URL must be defined in configuration');
+    if (!supabaseConfig?.key)
+      throw new Error('SUPABASE_KEY must be defined in configuration');
 
     this.supabase = createClient(supabaseConfig.url, supabaseConfig.key);
   }

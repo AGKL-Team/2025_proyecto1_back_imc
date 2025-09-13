@@ -1,40 +1,49 @@
 import { BadRequestException } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { SignInRequest } from '../../src/module/auth/application/requests/sign-in-request';
 import { SignUpRequest } from '../../src/module/auth/application/requests/sign-up-request';
 import { AuthService } from '../../src/module/auth/infrastructure/services/auth.service';
 import { SupabaseService } from '../../src/module/database/services/supabase.service';
+import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let supabaseService: jest.Mocked<SupabaseService>;
-  let supabaseClient: any;
+
+  // Definir fuera del beforeEach para mantener la referencia
+  const supabaseClient = {
+    rpc: jest.fn(),
+    auth: {
+      signUp: jest.fn(),
+      signInWithPassword: jest.fn(),
+      signOut: jest.fn(),
+    },
+  };
+  const supabaseService = {
+    getClient: jest.fn().mockReturnValue(supabaseClient),
+  } as any;
 
   beforeEach(async () => {
-    supabaseClient = {
-      rpc: jest.fn(),
-      auth: {
-        signUp: jest.fn(),
-        signInWithPassword: jest.fn(),
-        signOut: jest.fn(),
-      },
-    };
+    // Limpiar mocks antes de cada test
+    supabaseClient.rpc.mockReset();
+    supabaseClient.auth.signUp.mockReset();
+    supabaseClient.auth.signInWithPassword.mockReset();
+    supabaseClient.auth.signOut.mockReset();
+    supabaseService.getClient.mockClear();
 
-    supabaseService = {
-      getClient: jest.fn().mockReturnValue(supabaseClient),
-    } as any;
+    // valor por defecto para FRONTEND_URL
+    process.env.FRONTEND_URL = 'http://localhost:3000';
 
     const module = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [
         AuthService,
         { provide: SupabaseService, useValue: supabaseService },
+        ConfigTestProvider,
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-
-    // valor por defecto para FRONTEND_URL
-    process.env.FRONTEND_URL = 'http://localhost:3000';
   });
 
   // ======= SIGN UP =======
@@ -66,12 +75,26 @@ describe('AuthService', () => {
   });
 
   it('should throw if FRONTEND_URL is not defined', async () => {
-    delete process.env.FRONTEND_URL;
-    supabaseClient.rpc.mockResolvedValue(null);
+    process.env.FRONTEND_URL = '';
 
     await expect(
-      service.signUp({ email: 'test@test.com', password: '123456' }),
-    ).rejects.toThrow('FRONTEND_URL is not defined');
+      Test.createTestingModule({
+        imports: [ConfigModule],
+        providers: [
+          AuthService,
+          { provide: SupabaseService, useValue: supabaseService },
+          ConfigTestProvider,
+        ],
+      })
+        .compile()
+        .then((module) => {
+          const authService = module.get<AuthService>(AuthService);
+          return authService.signUp({
+            email: 'test@test.com',
+            password: '123456',
+          });
+        }),
+    ).rejects.toThrow('FRONTEND_URL must be defined');
   });
 
   it('should throw if signUp fails', async () => {
@@ -123,7 +146,7 @@ describe('AuthService', () => {
   });
 
   it('should throw if signOut fails', async () => {
-    supabaseClient.auth.signOut.mockResolvedValue({ error: 'fail' });
+    supabaseClient.auth.signOut.mockResolvedValue({ error: 'some error' });
 
     await expect(service.signOut()).rejects.toThrow(BadRequestException);
   });
