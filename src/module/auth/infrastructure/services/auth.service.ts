@@ -33,19 +33,11 @@ export class AuthService {
    */
   async signUp(credentials: SignUpRequest) {
     // ! Ensure the user not exists
-    const query = await this.supabaseClient.rpc('sql', {
-      query: 'SELECT 1 FROM auth.users WHERE email = ?',
-      params: [credentials.email],
-    });
-
-    // Ensure the query was successful
-    const userExists = Boolean(query.data);
-
-    if (userExists) {
-      throw new BadRequestException('User already exists');
-    }
+    await this.ensureUserNotExists(credentials);
 
     // 1. Set the redirection url when the user confirms their email
+    console.log(this.frontendUrl, 'FRONTEND_URL');
+
     credentials.options = {
       ...credentials.options,
       emailRedirectTo: `${this.frontendUrl}/auth/email-confirmed`,
@@ -57,6 +49,20 @@ export class AuthService {
     // ! If there is an error, throw a BadRequestException
     if (response.error) {
       throw new BadRequestException(response.error);
+    }
+  }
+
+  private async ensureUserNotExists(credentials: SignUpRequest) {
+    const query = await this.supabaseClient.rpc('sql', {
+      query: 'SELECT 1 FROM auth.users WHERE email = ?',
+      params: [credentials.email],
+    });
+
+    // Ensure the query was successful
+    const userExists = Boolean(query.data);
+
+    if (userExists) {
+      throw new BadRequestException('User already exists');
     }
   }
 
