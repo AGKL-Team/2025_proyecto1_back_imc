@@ -36,8 +36,6 @@ export class AuthService {
     await this.ensureUserNotExists(credentials);
 
     // 1. Set the redirection url when the user confirms their email
-    console.log(this.frontendUrl, 'FRONTEND_URL');
-
     credentials.options = {
       ...credentials.options,
       emailRedirectTo: `${this.frontendUrl}/auth/email-confirmed`,
