@@ -7,11 +7,9 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
-  console.log('Frontend URL:', process.env.FRONTEND_URL);
-
   // Middleware / pipes globales
   app.enableCors({
-    origin: process.env.FRONTEND_URL,
+    origin: true,
     credentials: true,
   });
   app.useGlobalPipes(
