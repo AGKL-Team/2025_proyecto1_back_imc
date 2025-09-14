@@ -8,9 +8,8 @@ async function bootstrap() {
   });
 
   // Middleware / pipes globales
-  const isProduction = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: isProduction ? process.env.FRONTEND_URL : 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   });
   app.useGlobalPipes(
