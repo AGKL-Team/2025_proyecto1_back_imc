@@ -50,7 +50,7 @@ export class AuthService {
     }
   }
 
-  private async ensureUserNotExists(credentials: SignUpRequest) {
+  public async ensureUserNotExists(credentials: SignUpRequest) {
     const query = await this.supabaseClient.rpc('sql', {
       query: 'SELECT 1 FROM auth.users WHERE email = ?',
       params: [credentials.email],

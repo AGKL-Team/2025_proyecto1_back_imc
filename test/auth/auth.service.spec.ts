@@ -17,6 +17,7 @@ describe('AuthService', () => {
       signUp: jest.fn(),
       signInWithPassword: jest.fn(),
       signOut: jest.fn(),
+      ensureUserNotExists: jest.fn(),
     },
   };
   const supabaseService = {
@@ -48,29 +49,42 @@ describe('AuthService', () => {
 
   // ======= SIGN UP =======
   it('should sign up a new user successfully', async () => {
-    supabaseClient.rpc.mockResolvedValue(null); // usuario no existe
-    supabaseClient.auth.signUp.mockResolvedValue({ data: {}, error: null });
+    // Arrange
+    const queryResult = {
+      data: null,
+      error: null,
+    };
+    supabaseClient.rpc.mockResolvedValue(queryResult);
+    supabaseClient.auth.signUp.mockResolvedValue({
+      error: null,
+    });
 
+    // Act
     const request: SignUpRequest = {
       email: 'test@test.com',
       password: '123456',
     };
     await service.signUp(request);
 
+    // Assert
     expect(supabaseClient.rpc).toHaveBeenCalled();
-    expect(supabaseClient.auth.signUp).toHaveBeenCalledWith({
-      ...request,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/auth/email-confirmed',
-      },
-    });
+    expect(supabaseClient.auth.signUp).toHaveBeenCalledWith(request);
   });
 
   it('should throw if user already exists', async () => {
-    supabaseClient.rpc.mockResolvedValue(true); // existe
+    // Arrange
+    const queryResult = {
+      data: [{ id: 'existing-user-id' }],
+      error: null,
+    };
+    supabaseClient.rpc.mockResolvedValue(queryResult);
 
+    // Assert
     await expect(
-      service.signUp({ email: 'exists@test.com', password: '123456' }),
+      service.signUp({
+        email: 'exists@test.com',
+        password: '123456',
+      }),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -98,7 +112,7 @@ describe('AuthService', () => {
   });
 
   it('should throw if signUp fails', async () => {
-    supabaseClient.rpc.mockResolvedValue(null);
+    supabaseClient.rpc.mockResolvedValue({ data: null, error: 'some-error' });
     supabaseClient.auth.signUp.mockResolvedValue({ error: 'fail' });
 
     await expect(

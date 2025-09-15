@@ -1,4 +1,9 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsStrongPassword,
+  MaxLength,
+} from 'class-validator';
 
 export class SignUpRequest {
   /** The user's email address. */
@@ -7,6 +12,13 @@ export class SignUpRequest {
   email: string;
   /** The user's password. */
   @IsNotEmpty()
+  @IsStrongPassword({
+    minLength: 6,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+  })
+  @MaxLength(16)
   password: string;
   options?: {
     /** The redirect url embedded in the email link */
