@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { AuthError, createClient, SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseConfig } from '../../../config/supabase.config';
 
 @Injectable()
@@ -20,5 +20,23 @@ export class SupabaseService {
 
   getClient(): SupabaseClient {
     return this.supabase;
+  }
+
+  handleError(error: AuthError) {
+    switch (error.code) {
+      case 'user_already_exists':
+        throw new BadRequestException('El usuario ya existe');
+      case 'invalid_email':
+        throw new BadRequestException('El correo electrónico no es válido');
+      case 'invalid_password':
+        throw new BadRequestException('La contraseña no es válida');
+      case 'invalid_credentials':
+        throw new BadRequestException('Las credenciales son inválidas');
+      default:
+        throw new BadRequestException(
+          'Ocurrió un error inesperado. Inténtalo de nuevo más tarde.' +
+            error.code,
+        );
+    }
   }
 }

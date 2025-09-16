@@ -1,29 +1,23 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { SupabaseClient } from '@supabase/supabase-js';
-
-import { FrontendConfig } from '../../../../config/frontent.config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { Repository } from 'typeorm';
 import { SupabaseService } from '../../../database/services/supabase.service';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';
 import { ApplicationUserResponse } from '../../application/responses/user-response.interface';
+import { Account } from '../../domain/models/account';
 
 @Injectable()
 export class AuthService {
   private readonly supabaseClient: SupabaseClient;
-  private readonly frontendUrl: string;
 
   constructor(
     private readonly supabaseService: SupabaseService,
-    private readonly configService: ConfigService,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
   ) {
     this.supabaseClient = this.supabaseService.getClient();
-
-    const frontendConfig = this.configService.get<FrontendConfig>('frontend');
-
-    if (!frontendConfig?.url) throw new Error('FRONTEND_URL must be defined');
-
-    this.frontendUrl = frontendConfig.url;
   }
 
   /**
@@ -35,19 +29,31 @@ export class AuthService {
     // ! Ensure the user not exists
     await this.ensureUserNotExists(credentials);
 
-    // 1. Set the redirection url when the user confirms their email
-    credentials.options = {
-      ...credentials.options,
-      emailRedirectTo: `${this.frontendUrl}/auth/email-confirmed`,
-    };
-
-    // 2. Create a new user with email and password
-    const response = await this.supabaseClient.auth.signUp(credentials);
+    // Create a new user with email and password
+    const response = await this.supabaseClient.auth.signUp({
+      email: credentials.email,
+      password: credentials.password,
+    });
 
     // ! If there is an error, throw a BadRequestException
     if (response.error) {
-      throw new BadRequestException(response.error);
+      this.supabaseService.handleError(response.error);
     }
+
+    // ! If user is not created, throw a BadRequestException
+    if (!response.data.user) {
+      throw new BadRequestException(
+        'Ocurrió un error mientras se creaba el usuario',
+      );
+    }
+
+    // Create an account to store additional user information like height
+    const account = this.accountRepository.create({
+      userId: response.data.user.id,
+      height: credentials.height,
+    });
+
+    await this.accountRepository.save(account);
   }
 
   public async ensureUserNotExists(credentials: SignUpRequest) {
@@ -60,7 +66,7 @@ export class AuthService {
     const userExists = Boolean(query.data);
 
     if (userExists) {
-      throw new BadRequestException('User already exists');
+      throw new BadRequestException('El usuario ya existe');
     }
   }
 
@@ -76,14 +82,24 @@ export class AuthService {
 
     // ! 2. If there is an error, throw a BadRequestException
     if (response.error) {
-      throw new BadRequestException(response.error);
+      this.supabaseService.handleError(response.error);
+      return;
     }
 
+    // Get the account information from the database
+    const account = await this.accountRepository.findOne({
+      where: { userId: response.data.user?.id },
+    });
+
+    if (!account) {
+      throw new BadRequestException('Cuenta no encontrada');
+    }
     // 3. Return the access token and its expiration time
     return {
       access_token: response.data.session.access_token,
       expires_in: response.data.session.expires_in,
       email: response.data.user.email,
+      height: account.height,
     } as ApplicationUserResponse;
   }
 
@@ -100,5 +116,46 @@ export class AuthService {
       throw new BadRequestException(response.error);
     }
     return response;
+  }
+
+  /**
+   * Get the currently authenticated user
+   */
+  async getCurrentUser(user: User) {
+    // Get the account information from the database
+    const account = await this.accountRepository.findOne({
+      where: { userId: user.id },
+    });
+
+    if (!account) {
+      throw new BadRequestException('Cuenta no encontrada');
+    }
+
+    // Return the user information
+    return {
+      id: user.id,
+      email: user.email,
+      height: account.height,
+    };
+  }
+
+  /**
+   * Update the height of the authenticated user
+   * @param user the authenticated user
+   * @param height the new height
+   */
+  async updateHeight(user: User, height: number) {
+    // Get the account information from the database
+    const account = await this.accountRepository.findOne({
+      where: { userId: user.id },
+    });
+
+    if (!account) {
+      throw new BadRequestException('Cuenta no encontrada');
+    }
+
+    // Update the height
+    account.height = height;
+    await this.accountRepository.save(account);
   }
 }

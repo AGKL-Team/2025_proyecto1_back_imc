@@ -10,7 +10,7 @@ async function bootstrap() {
   // Middleware / pipes globales
   const isProduction = process.env.NODE_ENV === 'production';
   app.enableCors({
-    origin: isProduction ? process.env.FRONTEND_URL : 'http://localhost:5173',
+    origin: isProduction ? process.env.FRONTEND_URL : true,
     credentials: true,
   });
   app.useGlobalPipes(
