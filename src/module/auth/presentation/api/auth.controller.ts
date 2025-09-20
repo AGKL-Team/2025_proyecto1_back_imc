@@ -11,10 +11,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User } from '@supabase/supabase-js';
-import { UpdateHeightRequest } from 'module/auth/application/requests/update-height-request';
-import { UserFromRequest } from 'module/auth/infrastructure/decorators/user.decorator';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';
+import { UpdateHeightRequest } from '../../application/requests/update-height-request';
+import { UserFromRequest } from '../../infrastructure/decorators/user.decorator';
 import { SupabaseAuthGuard } from '../../infrastructure/guard/supbase-auth.guard';
 import { AuthService } from '../../infrastructure/services/auth.service';
 

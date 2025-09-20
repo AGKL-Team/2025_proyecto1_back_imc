@@ -9,5 +9,6 @@ export const SupabaseTestProvider = {
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
     }),
+    handleError: SupabaseService.prototype.handleError,
   },
 };
