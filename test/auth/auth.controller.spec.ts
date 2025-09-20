@@ -1,10 +1,12 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { SignInWithPasswordCredentials } from '@supabase/supabase-js';
+import { UpdateHeightRequest } from 'module/auth/application/requests/update-height-request';
 import { SignInRequest } from '../../src/module/auth/application/requests/sign-in-request';
 import { SignUpRequest } from '../../src/module/auth/application/requests/sign-up-request';
 import { AuthService } from '../../src/module/auth/infrastructure/services/auth.service';
 import { AuthController } from '../../src/module/auth/presentation/api/auth.controller';
+import { fakeApplicationUser } from '../shared/fakes/user.fake';
 import { ConfigTestProvider } from '../shared/providers/config-test.provider';
 import { SupabaseTestProvider } from '../shared/providers/supabase-config-test.provider';
 
@@ -22,6 +24,7 @@ describe('AuthController', () => {
             signIn: jest.fn(),
             signUp: jest.fn(),
             signOut: jest.fn(),
+            updateHeight: jest.fn(),
           },
         },
         SupabaseTestProvider,
@@ -159,9 +162,11 @@ describe('AuthController', () => {
   // ======= SIGN UP =======
   it('should sign up a new user and return user data with a token', async () => {
     // Arrange
-    const request = {
+    const request: SignUpRequest = {
       email: 'test@gmail.com',
       password: 'MyStrongPassword123',
+      confirmPassword: 'MyStrongPassword123',
+      height: 1.72,
     };
 
     jest.spyOn(service, 'signUp').mockResolvedValue({} as any);
@@ -179,6 +184,8 @@ describe('AuthController', () => {
     const request: SignUpRequest = {
       email: 'test@gmail.com',
       password: 'MyStrongPassword123',
+      confirmPassword: 'MyStrongPassword123',
+      height: 1.72,
     };
 
     jest
@@ -198,6 +205,8 @@ describe('AuthController', () => {
     const request: SignUpRequest = {
       email: 'test@gmail.com',
       password: 'weak',
+      confirmPassword: 'weak',
+      height: 1.72,
     };
 
     const validationPipe = new ValidationPipe({
@@ -214,5 +223,28 @@ describe('AuthController', () => {
     // Assert
     await expect(result).rejects.toThrow(BadRequestException);
     expect(service.signUp).not.toHaveBeenCalled();
+  });
+
+  // ======= UPDATE HEIGHT =======
+  it('should update user height successfully', async () => {
+    // Arrange
+    const request: UpdateHeightRequest = {
+      height: 1.8,
+    };
+
+    jest.spyOn(service, 'updateHeight').mockResolvedValue({} as any);
+
+    // Act
+    const result = await service.updateHeight(
+      fakeApplicationUser,
+      request.height,
+    );
+
+    // Assert
+    expect(result).toEqual({});
+    expect(service.updateHeight).toHaveBeenCalledWith(
+      fakeApplicationUser,
+      request.height,
+    );
   });
 });

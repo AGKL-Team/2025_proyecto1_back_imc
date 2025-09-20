@@ -1,14 +1,20 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { User } from '@supabase/supabase-js';
 import { SignInRequest } from '../../application/requests/sign-in-request';
 import { SignUpRequest } from '../../application/requests/sign-up-request';
+import { UpdateHeightRequest } from '../../application/requests/update-height-request';
+import { UserFromRequest } from '../../infrastructure/decorators/user.decorator';
 import { SupabaseAuthGuard } from '../../infrastructure/guard/supbase-auth.guard';
 import { AuthService } from '../../infrastructure/services/auth.service';
 
@@ -25,6 +31,11 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('sign-up')
   async signUp(@Body(ValidationPipe) request: SignUpRequest) {
+    // ! Ensure the password and confirmPassword match
+    if (request.password !== request.confirmPassword) {
+      throw new BadRequestException('Las contraseñas no coinciden');
+    }
+
     return await this.authService.signUp(request);
   }
 
@@ -33,5 +44,22 @@ export class AuthController {
   @UseGuards(SupabaseAuthGuard)
   async signOut() {
     return await this.authService.signOut();
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SupabaseAuthGuard)
+  async getCurrentUser(@UserFromRequest() user: User) {
+    return await this.authService.getCurrentUser(user);
+  }
+
+  @Patch('update-height')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(SupabaseAuthGuard)
+  async updateHeight(
+    @UserFromRequest() user: User,
+    @Body(ValidationPipe) request: UpdateHeightRequest,
+  ) {
+    return await this.authService.updateHeight(user, request.height);
   }
 }
